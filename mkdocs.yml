@@ -1,0 +1,64 @@
+# ─────────── Site metadata ──────────────────────────────────────────────────
+site_name: pytest-tzshift
+site_description: >
+  A Pytest plugin that transparently re-runs tests under a matrix of
+  time-zones and locales.
+site_author: Pedro Sanvido
+repo_url: https://github.com/spedr/pytest-tzshift
+copyright: © 2025 Pedro Sanvido
+
+# ─────────── Theme ─────────────────────────────────────────────────────────
+theme:
+  name: readthedocs
+  highlightjs: true
+  collapse_navigation: false
+  sticky_navigation: true
+
+# ─────────── Navigation (sidebar) ──────────────────────────────────────────
+nav:
+  - Home: index.md
+  - Usage:
+      - Quick start: usage/quickstart.md
+      - Configuration: usage/configuration.md
+      - Markers & fixtures: usage/markers.md
+  - Reference:
+      - API reference: reference/api.md
+  - Changelog: changelog.md
+  - Contributing: contributing.md
+  - License: license.md
+
+# ─────────── Plug-ins ──────────────────────────────────────────────────────
+plugins:
+  - search                            # built-in full-text search
+  - mkdocstrings:                     # automatic API docs from docstrings
+      handlers:
+        python:
+          options:
+            show_source: false
+            merge_init_into_package: true
+  - git-revision-date-localized       # nice “Last updated” stamps
+  # Uncomment the next line if you want a nice link checker in CI
+  # - mike                             # versioned docs site
+
+# ─────────── Markdown extensions ───────────────────────────────────────────
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.inlinehilite
+  - pymdownx.highlight
+  - pymdownx.snippets
+  - pymdownx.tabbed
+
+# ─────────── Paths ─────────────────────────────────────────────────────────
+docs_dir: docs          # default; included for clarity
+site_dir: site          # build output
+
+# ─────────── Extra assets (optional) ───────────────────────────────────────
+# extra_css:
+#   - css/custom.css
+# extra_javascript:
+#   - js/custom.js

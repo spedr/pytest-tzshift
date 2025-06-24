@@ -1,0 +1,49 @@
+[build-system]
+requires = [
+  "setuptools>=61.0.0",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pytest-tzshift"
+description = "A Pytest plugin that transparently re-runs tests under a matrix of timezones and locales."
+version = "0.1.0"
+readme = "README.rst"
+requires-python = ">=3.8"
+authors = [
+    { name = "Pedro Sanvido", email = "pedro.sanvido@acad.pucrs.br" },
+]
+maintainers = [
+    { name = "Pedro Sanvido", email = "pedro.sanvido@acad.pucrs.br" },
+]
+license = {file = "LICENSE"}
+classifiers = [
+    "Framework :: Pytest",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Testing",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "License :: OSI Approved :: MIT License",
+]
+
+dependencies = [
+    "pytest>=7.0",
+    "backports.zoneinfo>=0.2.1;python_version<'3.9'",  # For Python < 3.9 support
+]
+
+[project.optional-dependencies]
+pytz = ["pytz>=2021.1"]
+
+[project.urls]
+Repository = "https://github.com/spedr/pytest-tzshift"
+[project.entry-points.pytest11]
+tzshift = "pytest_tzshift.plugin"
