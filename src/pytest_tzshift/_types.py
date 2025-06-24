@@ -1,10 +1,25 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+import sys
+from dataclasses import dataclass as _dc
 from typing import Iterator, Tuple
 
+PY310_PLUS = sys.version_info >= (3, 10)
 
-@dataclass(frozen=True, slots=True)
+# small helper: returns a version-aware dataclass decorator
+def _dataclass(**kwargs):          # kwargs contain frozen=True, slots=True
+    if not PY310_PLUS:             # 3.9: remove the unsupported key
+        kwargs.pop("slots", None)
+
+    def wrap(cls):
+        cls = _dc(**kwargs)(cls)   # apply the regular @dataclass
+        if not PY310_PLUS:         # emulate slots
+            cls.__slots__ = tuple(cls.__annotations__)
+        return cls
+
+    return wrap
+
+@_dataclass(frozen=True, slots=True)
 class TzShift:
     """
     An immutable data object holding the active timezone and locale.
@@ -24,18 +39,19 @@ class TzShift:
     timezone: str
     locale: str
 
-    def __iter__(self) -> Iterator[str]:  # allows:  tz, loc = tzshift
+    def __iter__(self) -> Iterator[str]:
         return iter((self.timezone, self.locale))
 
-    def __len__(self) -> int:  # len(tzshift) → 2
+    def __len__(self) -> int:
         return 2
 
-    def __getitem__(self, idx: int) -> str:  # tzshift[0] / tzshift[1]
+    def __getitem__(self, idx: int) -> str:
         if idx == 0:
             return self.timezone
-        elif idx == 1:
+        if idx == 1:
             return self.locale
         raise IndexError(idx)
 
-    def as_tuple(self) -> Tuple[str, str]:  # helper for explicit tuple
+    def as_tuple(self) -> Tuple[str, str]:
+        """Helper for explicit tuple."""
         return (self.timezone, self.locale)

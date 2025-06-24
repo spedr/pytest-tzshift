@@ -37,6 +37,7 @@ classifiers = [
 dependencies = [
     "pytest>=7.0",
     "backports.zoneinfo>=0.2.1;python_version<'3.9'",  # For Python < 3.9 support
+    "tzdata>=2024.1",   # IANA tzdb fallback for Windows
 ]
 
 [project.optional-dependencies]
