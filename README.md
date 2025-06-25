@@ -6,7 +6,6 @@
 
 *A tiny Pytest plug-in that automatically re-runs your tests under a matrix of time-zones and locales.*
 
----
 
 ## Why?
 
@@ -21,7 +20,6 @@ tests/test_format.py::test_human_readable[1|America/New_York|C]     PASSED
 tests/test_format.py::test_human_readable[2|Europe/Berlin|de_DE]    FAILED
 ```
 
----
 
 ## Installation
 
@@ -31,7 +29,6 @@ pip install pytest-tzshift          # requires Python ≥ 3.9
 
 No further setup is necessary. The plug-in is auto-discovered by Pytest.
 
----
 
 ## Quick start
 
@@ -49,7 +46,6 @@ def test_price_formatting(tzshift):
 
 Run Pytest as usual; each test will execute for every `(timezone, locale)` pair.
 
----
 
 ## Default matrix
 
@@ -64,7 +60,6 @@ Run Pytest as usual; each test will execute for every `(timezone, locale)` pair.
 
 Unavailable zones/locales are skipped with a warning.
 
----
 
 ## Customising the matrix
 
@@ -103,7 +98,6 @@ def test_native_env():
     ...
 ```
 
----
 
 ## Platform notes
 
@@ -111,7 +105,6 @@ def test_native_env():
   You'll still see separate parametrised runs, but all in the system zone.
 * Changing the process locale is global; avoid running `pytest-tzshift` with parallel workers.
 
----
 
 ## Documentation
 
@@ -122,14 +115,12 @@ def test_native_env():
 
 Browse the full site at **[https://spedr.github.io/pytest-tzshift](https://spedr.github.io/pytest-tzshift)** once published.
 
----
 
 ## Contributing
 
 Bug reports, feature ideas, and pull requests are warmly welcome!
 See [CONTRIBUTING](docs/contributing.md) for tips on setting up a dev environment, coding style, and running the test suite.
 
----
 
 ## License
 
