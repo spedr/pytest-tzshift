@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 name = "pytest-tzshift"
 description = "A Pytest plugin that transparently re-runs tests under a matrix of timezones and locales."
 version = "0.1.0"
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.9"
 authors = [
     { name = "Pedro Sanvido", email = "pedro.sanvido@acad.pucrs.br" },
@@ -39,9 +39,6 @@ dependencies = [
     "backports.zoneinfo>=0.2.1;python_version<'3.9'",  # For Python < 3.9 support
     "tzdata>=2024.1",   # IANA tzdb fallback for Windows
 ]
-
-[project.optional-dependencies]
-pytz = ["pytz>=2021.1"]
 
 [project.urls]
 Repository = "https://github.com/spedr/pytest-tzshift"
