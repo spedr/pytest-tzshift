@@ -6,7 +6,6 @@
 
 *A tiny Pytest plug-in that automatically re-runs your tests under a matrix of time-zones and locales.*
 
----
 
 ## Why?
 
@@ -122,7 +121,6 @@ Browse the full site at **[https://spedr.github.io/pytest-tzshift](https://spedr
 Bug reports, feature ideas, and pull requests are warmly welcome!
 See [CONTRIBUTING](docs/contributing.md) for tips on setting up a dev environment, coding style, and running the test suite.
 
----
 
 ## License
 
