@@ -6,18 +6,20 @@ from typing import Iterator, Tuple
 
 PY310_PLUS = sys.version_info >= (3, 10)
 
+
 # small helper: returns a version-aware dataclass decorator
-def _dataclass(**kwargs):          # kwargs contain frozen=True, slots=True
-    if not PY310_PLUS:             # 3.9: remove the unsupported key
+def _dataclass(**kwargs):  # kwargs contain frozen=True, slots=True
+    if not PY310_PLUS:  # 3.9: remove the unsupported key
         kwargs.pop("slots", None)
 
     def wrap(cls):
-        cls = _dc(**kwargs)(cls)   # apply the regular @dataclass
-        if not PY310_PLUS:         # emulate slots
+        cls = _dc(**kwargs)(cls)  # apply the regular @dataclass
+        if not PY310_PLUS:  # emulate slots
             cls.__slots__ = tuple(cls.__annotations__)
         return cls
 
     return wrap
+
 
 @_dataclass(frozen=True, slots=True)
 class TzShift:

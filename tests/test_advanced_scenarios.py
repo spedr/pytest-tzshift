@@ -18,7 +18,7 @@ _ORIG_LOCALE: str = locale.setlocale(locale.LC_ALL)
 
 
 def _available_locales(candidates: list[str]) -> list[str]:
-    """Return only locales that *can* be set on *this* host."""
+    """Return only locales that can be set on this host."""
     available: list[str] = []
     original = locale.setlocale(locale.LC_ALL)
     try:

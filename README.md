@@ -4,14 +4,14 @@
 [![CI](https://github.com/spedr/pytest-tzshift/actions/workflows/ci.yml/badge.svg)](https://github.com/spedr/pytest-tzshift/actions/workflows/ci.yml)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-*A tiny Pytest plug-in that automatically re-runs your tests under a **matrix of time-zones and locales** so you can catch formatting, parsing, and daylight-saving bugs early.*
+*A tiny Pytest plug-in that automatically re-runs your tests under a matrix of time-zones and locales.*
 
 ---
 
 ## Why?
 
 Time-zones and locales are global process settings.
-If your code **formats dates**, **parses user input**, or depends on **`datetime.now()`**, it may behave differently on users' machines.
+If your code formats dates, parses user input, or depends on `datetime.now()`, it may behave differently on users' machines.
 
 `pytest-tzshift` attempts to make these differences visible:
 
@@ -105,27 +105,11 @@ def test_native_env():
 
 ---
 
-## How it works
-
-* **Collection phase**
-  `pytest_generate_tests` builds the Cartesian product of the selected time-zones and locales, applies an optional `--tzshift-max` limit, and parametrises the fixture indirectly.
-
-* **Fixture**
-  For each combination, the `tzshift` fixture
-
-  1. Saves the original `TZ` env-var and current locale,
-  2. Calls `locale.setlocale(LC_ALL, …)` (skips if unavailable),
-  3. Exports `TZ=…` and calls `time.tzset()` (on platforms that support it),
-  4. Yields an immutable `TzShift(timezone, locale)` helper,
-  5. Restores everything in a `finally` block.
-
----
-
 ## Platform notes
 
 * On **Windows**, `time.tzset()` is missing; the time-zone part becomes a no-op (locales still work).
   You'll still see separate parametrised runs, but all in the system zone.
-* Changing the process locale is global; avoid running locale-sensitive tests in parallel workers.
+* Changing the process locale is global; avoid running `pytest-tzshift` with parallel workers.
 
 ---
 
@@ -149,4 +133,4 @@ See [CONTRIBUTING](docs/contributing.md) for tips on setting up a dev environmen
 
 ## License
 
-Released under the [MIT License](license.md).
+Released under the [MIT License](LICENSE).

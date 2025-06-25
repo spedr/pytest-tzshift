@@ -9,7 +9,7 @@ name = "pytest-tzshift"
 description = "A Pytest plugin that transparently re-runs tests under a matrix of timezones and locales."
 version = "0.1.0"
 readme = "README.rst"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 authors = [
     { name = "Pedro Sanvido", email = "pedro.sanvido@acad.pucrs.br" },
 ]

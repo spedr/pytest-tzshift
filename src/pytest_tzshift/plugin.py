@@ -243,7 +243,8 @@ def _filter_valid_locales(locs: List[str]) -> List[str]:
 
     if bad:
         warnings.warn(
-            "tzshift: ignoring unavailable locales: " + ", ".join(repr(l) for l in bad),
+            "tzshift: ignoring unavailable locales: "
+            + ", ".join(repr(locale) for locale in bad),
             stacklevel=2,
         )
     return valid

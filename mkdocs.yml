@@ -2,7 +2,7 @@
 site_name: pytest-tzshift
 site_description: >
   A Pytest plugin that transparently re-runs tests under a matrix of
-  time-zones and locales.
+  timezones and locales.
 site_author: Pedro Sanvido
 repo_url: https://github.com/spedr/pytest-tzshift
 copyright: © 2025 Pedro Sanvido
@@ -36,8 +36,7 @@ plugins:
           options:
             show_source: false
             merge_init_into_package: true
-  - git-revision-date-localized       # nice “Last updated” stamps
-  # Uncomment the next line if you want a nice link checker in CI
+  - git-revision-date-localized       # nice "Last updated" stamps
   # - mike                             # versioned docs site
 
 # ─────────── Markdown extensions ───────────────────────────────────────────
@@ -56,9 +55,3 @@ markdown_extensions:
 # ─────────── Paths ─────────────────────────────────────────────────────────
 docs_dir: docs          # default; included for clarity
 site_dir: site          # build output
-
-# ─────────── Extra assets (optional) ───────────────────────────────────────
-# extra_css:
-#   - css/custom.css
-# extra_javascript:
-#   - js/custom.js
