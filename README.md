@@ -1,7 +1,7 @@
 # pytest-tzshift
 
 [![PyPI version](https://img.shields.io/pypi/v/pytest-tzshift.svg)](https://pypi.org/project/pytest-tzshift/)
-[![CI](https://github.com/spedr/pytest-tzshift/actions/workflows/ci.yml/badge.svg)](https://github.com/spedr/pytest-tzshift/actions/workflows/ci.yml)
+[![CI](https://github.com/spedr/pytest-tzshift/actions/workflows/CI.yml/badge.svg)](https://github.com/spedr/pytest-tzshift/actions/workflows/CI.yml)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 *A tiny Pytest plug-in that automatically re-runs your tests under a matrix of time-zones and locales.*
@@ -108,20 +108,17 @@ def test_native_env():
 
 ## Documentation
 
-* **Quick start** – `docs/usage/quickstart.md`
-* **Configuration details** – `docs/usage/configuration.md`
-* **Markers & fixtures** – `docs/usage/markers.md`
-* **API reference** – `docs/reference/api.md`
-
-Browse the full site at **[https://spedr.github.io/pytest-tzshift](https://spedr.github.io/pytest-tzshift)** once published.
+* [**Quick start**](https://pytest-tzshift.github.io/usage/quickstart/)
+* [**Configuration**](https://pytest-tzshift.github.io/usage/configuration/)
+* [**API Reference**](https://pytest-tzshift.github.io/reference/api/)
 
 
 ## Contributing
 
 Bug reports, feature ideas, and pull requests are warmly welcome!
-See [CONTRIBUTING](docs/contributing.md) for tips on setting up a dev environment, coding style, and running the test suite.
+See [Contributing](docs/contributing.md) for tips on setting up a dev environment, coding style, and running the test suite.
 
 
 ## License
 
-Released under the [MIT License](LICENSE).
+Released under the [MIT License](docs/license.md).

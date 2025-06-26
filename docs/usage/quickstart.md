@@ -1,139 +1,191 @@
-Here's a concise, informative, and friendly `quickstart.md` page to get users up and running quickly:
-
----
-
 # Quickstart Guide
 
-Welcome! **pytest-tzshift** is a simple yet powerful Pytest plugin that transparently reruns your tests under multiple combinations of timezones and locales. This helps you discover timezone- or locale-dependent bugs early.
+Testing code that depends on the system's timezone or locale can be a headache. Your tests might pass on your machine in New York but fail in CI running in a UTC environment. `pytest-tzshift` solves this by making it trivial to run your tests across a matrix of different timezones and locales.
 
-This guide will help you set up the plugin and start using it right away.
+This guide will get you up and running in minutes.
 
 ## Installation
 
-Install via `pip`:
+First, install the plugin using pip:
 
-```shell
+```bash
 pip install pytest-tzshift
 ```
 
-Make sure your Python environment is version **3.9 or newer** (required by the built-in `zoneinfo` library).
+Pytest will automatically discover and enable the plugin.
 
-## Usage
+## Basic Usage: The `tzshift` Fixture
 
-Once installed, simply request the `tzshift` fixture in your tests, and pytest-tzshift will automatically run them multiple times with different timezone and locale combinations.
+The core of the plugin is the `tzshift` fixture. To use it, simply add it as an argument to your test function. The plugin will then automatically run your test multiple times, once for each combination of the default timezones and locales.
 
-Here's a simple example:
+Let's say you have a function that formats the current time. Its output is sensitive to both the system's timezone (`%Z`) and locale (`%x`, `%X`).
 
 ```python
-def test_localized_datetime(tzshift):
-    timezone, locale = tzshift
+# test_time.py
+import time
+from datetime import datetime
 
-    # Your test code here, e.g., using datetime or locale
-    from datetime import datetime
-    now = datetime.now().strftime("%c")
-    print(f"Running with TZ={timezone}, locale={locale}, datetime={now}")
+def format_current_time():
+    """Formats the current time, sensitive to TZ and locale."""
+    # datetime.now() respects the TZ environment variable
+    # strftime() respects the current locale for %x and %X
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z (%x)")
 
-    # Add your assertions here
+def test_datetime_formatting(tzshift):
+    """
+    This test will be run under various TZ/locale combinations.
+    """
+    # The tzshift fixture has already set the environment for us.
+    # It also yields a handy object with the current settings.
+    current_tz, current_locale = tzshift
+
+    print(f"Testing with TZ={current_tz}, Locale={current_locale}")
+    output = format_current_time()
+    print(f"-> Output: {output}")
+
+    # Your assertions would go here.
+    # For this example, we'll just check that it runs.
+    assert isinstance(output, str)
 ```
 
-When you run Pytest, your test will run multiple times:
+Now, run pytest:
 
-```shell
-pytest test_example.py
+```bash
+pytest -v
 ```
 
-You will see output similar to:
+You'll see your single test function expanded into many parametrized runs, with clear and filterable test IDs:
 
-```
-test_example.py::test_localized_datetime[0|UTC|C] PASSED
-test_example.py::test_localized_datetime[1|UTC|en_US.UTF-8] PASSED
-test_example.py::test_localized_datetime[2|America/New_York|C] PASSED
-test_example.py::test_localized_datetime[3|America/New_York|en_US.UTF-8] PASSED
+```text
+$ pytest -v
+========================= test session starts ==========================
 ...
+collected 30 items
+
+test_time.py::test_datetime_formatting[0|UTC|C] PASSED
+test_time.py::test_datetime_formatting[1|UTC|en_US.UTF-8] SKIPPED
+test_time.py::test_datetime_formatting[2|UTC|de_DE.UTF-8] SKIPPED
+...
+test_time.py::test_datetime_formatting[5|America/New_York|C] PASSED
+test_time.py::test_datetime_formatting[6|America/New_York|en_US.UTF-8] SKIPPED
+...
+test_time.py::test_datetime_formatting[29|Asia/Tokyo|ja_JP.UTF-8] SKIPPED
+
+=================== 6 passed, 24 skipped, 2 warnings ===================
 ```
 
-## Customizing timezone and locale combinations
+**What just happened?**
 
-You can specify your preferred timezone and locale combinations either globally or per-test.
+1.  `pytest-tzshift` saw that `test_datetime_formatting` requested the `tzshift` fixture.
+2.  It generated a list of `(timezone, locale)` pairs from its default lists.
+3.  For each pair, the `tzshift` fixture:
+    a. Set the `TZ` environment variable.
+    b. Set the system locale via `locale.setlocale(locale.LC_ALL, ...)`.
+    c. Yielded a `TzShift` object so your test could inspect the current settings.
+    d. Cleaned up and restored the original environment after the test finished.
+4.  If a specific locale wasn't available on the system (common in minimal CI containers), the plugin automatically skipped that test run with a helpful message, preventing spurious failures.
 
-### Global configuration (`pytest.ini`)
+## Configuration
 
-Add your desired timezones and locales to your project's `pytest.ini` or `pyproject.toml`:
+You'll almost certainly want to customize the timezones and locales for your project. You can do this globally in `pytest.ini` or for a single run via the command line.
+
+### Using `pytest.ini`
+
+This is the recommended way to set project-wide defaults. Create or edit your `pytest.ini` file:
 
 ```ini
+# pytest.ini
 [pytest]
 tz_timezones =
     UTC
     America/Los_Angeles
+    Asia/Tokyo
+
 tz_locales =
     C
     en_US.UTF-8
-    es_ES.UTF-8
+    ja_JP.UTF-8
 ```
 
-### Command-line overrides
+Now, `pytest-tzshift` will use these lists instead of its built-in defaults. The plugin validates these values, warning you if a timezone is unknown or a locale is unavailable on the test runner.
 
-You can quickly override your config via command-line flags:
+### Using Command-Line Flags
 
-```shell
-pytest --tz-timezones=Asia/Tokyo,UTC --tz-locales=ja_JP.UTF-8,C
+To override the `ini` settings for a specific run, use the command-line flags. Values should be comma-separated.
+
+```bash
+pytest --tz-timezones="UTC,Europe/Berlin" --tz-locales="C"
 ```
 
-### Per-test markers
+## Fine-Grained Control with Markers
 
-To limit or disable timezone/locale shifting for specific tests or modules, use the `tzshift` marker:
+Sometimes you need to change the behavior for a single test or class. The `@pytest.mark.tzshift` marker gives you that power.
 
 ```python
 import pytest
 
-@pytest.mark.tzshift(timezones=["UTC"], locales=["C"])
-def test_limited(tzshift):
-    # Runs only once with UTC/C
-    pass
+# This test will use the global settings from pytest.ini
+def test_with_global_config(tzshift):
+    ...
 
+# This test will ONLY run with the specified timezones and the global locales
+@pytest.mark.tzshift(timezones=["UTC", "Europe/Moscow"])
+def test_specific_timezones(tzshift):
+    assert tzshift.timezone in ("UTC", "Europe/Moscow")
+
+# This test will use the global timezones but only the 'C' locale
+@pytest.mark.tzshift(locales=["C"])
+def test_specific_locale(tzshift):
+    assert tzshift.locale == "C"
+
+# If a test is incompatible with tzshift, you can disable it entirely
 @pytest.mark.tzshift(disable=True)
-def test_no_tzshift():
-    # No timezone/locale parametrization
-    pass
+def test_something_unrelated(tzshift):
+    # This test will run only once, and the tzshift fixture
+    # will not modify the environment.
+    ...
 ```
 
-## Understanding the fixture object (`TzShift`)
+## Special Values: The "SYSTEM" Sentinel
 
-Inside tests, the provided `tzshift` fixture object can be unpacked into timezone and locale:
+What if you want to include a baseline run using the test runner's actual system environment? `pytest-tzshift` provides a special `"SYSTEM"` sentinel for this. It's case-insensitive, so `system` or `System` work too.
 
-```python
-def test_example(tzshift):
-    tz, loc = tzshift
-    # or use tzshift.timezone, tzshift.locale
+When `"SYSTEM"` is used, the plugin will not modify the corresponding environment setting for that run.
+
+```ini
+# pytest.ini
+[pytest]
+tz_timezones =
+    SYSTEM  # Run once with the machine's original TZ
+    UTC
+    America/New_York
+
+tz_locales =
+    SYSTEM  # Run once with the machine's original locale
+    en_US.UTF-8
 ```
 
-The object is immutable and can be treated like a tuple.
+The test ID for these runs will use `sys` for brevity: `...[0|sys|sys]`.
 
-## Limit number of combinations
+## Limiting Combinations
 
-If you have many combinations, you can cap the maximum number to test:
+The Cartesian product of timezones and locales can create a huge number of tests. To keep CI times reasonable, you can cap the total number of combinations with `--tzshift-max` or the corresponding `ini` option.
 
-```shell
+**Via Command Line:**
+
+```bash
+# Only run the first 10 combinations
 pytest --tzshift-max=10
 ```
 
-Or via your configuration:
+**Via `pytest.ini`:**
 
 ```ini
+# pytest.ini
 [pytest]
-tzshift_max = 10
+tzshift_max = 20
 ```
 
-## Disabling completely
+The plugin will issue a warning when it truncates the test list, so you're always aware that it's happening.
 
-To completely disable pytest-tzshift for a test run:
-
-```shell
-pytest --no-tzshift
-```
-
----
-
-That's it! You’re now ready to thoroughly test your timezone- and locale-sensitive code easily and efficiently.
-
-Next up: check out the [Configuration](configuration.md) section for a deeper dive.
+Happy testing!

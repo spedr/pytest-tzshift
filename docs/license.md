@@ -1,7 +1,3 @@
-Certainly! Here’s your `license.md` formatted for Markdown, as requested:
-
----
-
 # License
 
 The MIT License (MIT)

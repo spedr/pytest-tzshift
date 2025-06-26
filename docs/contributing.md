@@ -9,9 +9,9 @@ Whether you're reporting a bug, suggesting a feature, improving documentation, o
 
 ## How to contribute
 
-### 1. Open an Issue
+### Open an Issue
 
-If you’ve found a bug or have an idea, please [open an issue](https://github.com/spedr/pytest-tzshift/issues) on GitHub.
+If you've found a bug or have an idea, please [open an issue](https://github.com/spedr/pytest-tzshift/issues) on GitHub.
 Describe:
 
 * What you tried
@@ -23,7 +23,7 @@ Feel free to suggest enhancements, ask questions, or request new features!
 
 ---
 
-### 2. Fork & Clone
+### Fork & Clone
 
 * Click "Fork" on GitHub.
 * Clone your fork locally:
@@ -35,7 +35,7 @@ Feel free to suggest enhancements, ask questions, or request new features!
 
 ---
 
-### 3. Set Up Your Environment
+### Set Up Your Environment
 
 We recommend using [virtualenv](https://virtualenv.pypa.io/) or [venv](https://docs.python.org/3/library/venv.html):
 
@@ -49,7 +49,7 @@ This will install pytest-tzshift in "editable" mode, along with development depe
 
 ---
 
-### 4. Make Changes
+### Make Changes
 
 * Follow [PEP8](https://peps.python.org/pep-0008/) style and keep code readable.
 * Add tests for new features or bugfixes.
@@ -75,11 +75,11 @@ mypy src/            # type checks
 
 ---
 
-### 6. Send a Pull Request
+### Send a Pull Request
 
 Push your branch to your fork and open a pull request against the `main` branch.
 
-* Summarize your changes and why they’re needed.
+* Summarize your changes and why they're needed.
 * Reference any related issues.
 * If it’s a work-in-progress, mark it as a draft PR.
 
@@ -87,7 +87,7 @@ Push your branch to your fork and open a pull request against the `main` branch.
 
 ## Coding Guidelines
 
-* **Tests:** Place new tests in `tests/`, using the same pattern as existing ones.
+* **Tests:** Place new tests under `tests/`
 * **Docs:** Update Markdown docs in `docs/` as needed, especially for new features or config.
 * **Commits:** Use clear, descriptive commit messages.
 
@@ -102,5 +102,3 @@ Push your branch to your fork and open a pull request against the `main` branch.
 ---
 
 Thank you!
-
----
