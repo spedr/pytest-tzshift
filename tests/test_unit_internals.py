@@ -71,8 +71,9 @@ def test_tzshift_sequence_protocol_and_frozen():
     with pytest.raises(dataclasses.FrozenInstanceError):
         ts.timezone = "Europe/Paris"
 
-    assert not hasattr(ts, "__dict__")        # slots -> no instance dict
-    assert "timezone" in ts.__slots__         # slots really defined
+    if sys.version_info >= (3, 10):
+        assert not hasattr(ts, "__dict__")    # slots -> no instance dict
+    assert "timezone" in ts.__slots__
 
 
 def test_is_system_sentinel_recognises_variations():
