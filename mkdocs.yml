@@ -20,10 +20,10 @@ nav:
   - Usage:
       - Quick start: usage/quickstart.md
       - Configuration: usage/configuration.md
-      - Markers & fixtures: usage/markers.md
+ #     - Markers & fixtures: usage/markers.md
   - Reference:
       - API reference: reference/api.md
-  - Changelog: changelog.md
+ # - Changelog: changelog.md
   - Contributing: contributing.md
   - License: license.md
 

@@ -1,146 +1,179 @@
 # Configuration
 
-You can control **pytest-tzshift** using your `pytest.ini`/`pyproject.toml` config file, command-line flags, and per-test markers. This page explains all options and how they interact.
+You can set project-wide defaults, override them for a specific test run via the command line, or apply fine-grained control to individual tests or modules using markers.
+
+This guide covers the three layers of configuration, from the broadest to the most specific.
+
+## Configuration Layers
+
+Understanding the order of precedence is key to using `pytest-tzshift` effectively. Settings are applied in the following order, with later steps overriding earlier ones:
+
+1.  **`pytest.ini` / `pyproject.toml`**: This is where you set your project-wide defaults. It's the best place to define the core set of timezones and locales you want to test against.
+2.  **Command-Line Options**: These flags override the `ini` file settings, making them perfect for CI runs or temporary adjustments without modifying project files.
+3.  **`@pytest.mark.tzshift` Marker**: This marker provides the most granular control, allowing you to change or disable parametrization for a specific test function, class, or module.
+
+Let's dive into each layer.
 
 ---
 
-## 1. Configuration File Options (`pytest.ini` or `pyproject.toml`)
+## 1. Project-Wide Defaults (`pytest.ini` or `pyproject.toml`)
 
-Add these under your `[pytest]` section:
+For most projects, you'll want a consistent set of timezones and locales for all your tests. You can define these in your `pytest.ini` or `pyproject.toml` file.
+
+### Available Settings
+
+*   `tz_timezones`: A list of IANA timezone names (one per line).
+*   `tz_locales`: A list of locale identifiers (one per line).
+*   `tzshift_max`: An integer to cap the total number of generated test combinations. `0` means no limit.
+
+### Example: `pytest.ini`
 
 ```ini
+# pytest.ini
 [pytest]
 tz_timezones =
     UTC
-    America/New_York
-    Europe/Berlin
+    America/Los_Angeles
+    Europe/Paris
 
 tz_locales =
     C
     en_US.UTF-8
-    de_DE.UTF-8
+    fr_FR.UTF-8
 
-tzshift_max = 12
+# Don't generate more than 50 combinations in total
+tzshift_max = 50
 ```
 
-### Option reference
+### Example: `pyproject.toml`
 
-| Option         | Type     | Description                                                                                                     |
-| -------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
-| `tz_timezones` | linelist | List of IANA timezone names. One per line. Default: UTC, New York, London, Kolkata, Sydney, Tokyo               |
-| `tz_locales`   | linelist | List of POSIX locales (e.g., `en_US.UTF-8`). Default: C, en\_US.UTF-8, de\_DE.UTF-8, fr\_FR.UTF-8, ja\_JP.UTF-8 |
-| `tzshift_max`  | int      | Maximum number of timezone/locale combinations to generate. Default: unlimited (`0`)                            |
+If you prefer using `pyproject.toml`, the configuration is equivalent:
+
+```toml
+# pyproject.toml
+[tool.pytest.ini_options]
+tz_timezones = [
+    "UTC",
+    "America/Los_Angeles",
+    "Europe/Paris",
+]
+tz_locales = [
+    "C",
+    "en_US.UTF-8",
+    "fr_FR.UTF-8",
+]
+# Don't generate more than 50 combinations in total
+tzshift_max = 50
+```
+
+> **Note:** If you don't provide any configuration, `pytest-tzshift` uses a built-in list of common timezones and locales as a sensible default.
 
 ---
 
-## 2. Command-Line Options
+## 2. Command-Line Overrides
 
-All config options can also be set as command-line flags, overriding values in config files:
+For temporary changes, you can override the `ini` settings from the command line. This is especially useful in CI/CD pipelines where you might want to run a faster, more limited set of combinations.
 
-| CLI Option       | Example Value                 | Description                                   |
-| ---------------- | ----------------------------- | --------------------------------------------- |
-| `--tz-timezones` | `UTC,Europe/Paris,Asia/Tokyo` | Comma-separated list of IANA timezones to use |
-| `--tz-locales`   | `C,en_GB.UTF-8,fr_FR.UTF-8`   | Comma-separated list of locales to use        |
-| `--tzshift-max`  | `5`                           | Maximum number of combinations to generate    |
-| `--no-tzshift`   | *(no value)*                  | Completely disables tzshift for this test run |
+### Available Options
 
-**Examples:**
+*   `--tz-timezones`: A comma-separated string of timezone names.
+*   `--tz-locales`: A comma-separated string of locale identifiers.
+*   `--tzshift-max`: An integer cap on test combinations.
+*   `--no-tzshift`: A flag to disable the plugin entirely for the current run.
 
-```shell
-pytest --tz-timezones=Asia/Tokyo,UTC --tz-locales=ja_JP.UTF-8,C
-pytest --tzshift-max=10
+### Example Usage
+
+Imagine your `pytest.ini` defines 5 timezones and 5 locales (25 combinations). For a quick pull request check, you could run:
+
+```bash
+pytest --tz-timezones="UTC,America/New_York" --tz-locales="en_US.UTF-8"
+```
+
+This command will ignore the `ini` settings and run your tests against only two combinations: `(UTC, en_US.UTF-8)` and `(America/New_York, en_US.UTF-8)`.
+
+To disable the plugin for a single run without changing any code:
+
+```bash
 pytest --no-tzshift
 ```
 
-*Note: Command-line values take priority over `pytest.ini`.*
-
 ---
 
-## 3. Per-Test or Per-Class/Module Control with Markers
+## 3. Fine-Grained Control with Markers
 
-You can override or disable timezones/locales for specific tests or groups using the `@pytest.mark.tzshift` marker.
+The `@pytest.mark.tzshift` marker gives you ultimate control at the level of a test, class, or module. It can override the global configuration or even disable parametrization for specific items.
 
-### Example: Override for a single test
+### Marker Arguments
+
+*   `timezones: List[str]`: A list of timezones to use for this scope.
+*   `locales: List[str]`: A list of locales to use for this scope.
+*   `disable: bool`: If `True`, disables `tzshift` parametrization for this scope.
+
+### Example: Overriding for a Single Test
+
+If you have a test that is specifically sensitive to Daylight Saving Time transitions in the US, you can target it precisely.
+
+```python
+import pytest
+from datetime import datetime
+
+@pytest.mark.tzshift(timezones=["America/New_York", "America/Chicago"])
+def test_dst_transition(tzshift):
+    # This test will only run with the two specified timezones,
+    # but will use the globally configured locales.
+    tz, loc = tzshift
+    # ... test logic for DST ...
+```
+
+### Example: Overriding for a Class
+
+You can apply the marker to a class to affect all tests within it.
 
 ```python
 import pytest
 
-@pytest.mark.tzshift(timezones=["UTC"], locales=["C"])
-def test_specific(tzshift):
-    # Will only run once, with UTC and C locale
-    ...
+@pytest.mark.tzshift(locales=["ja_JP.UTF-8"])
+class TestJapaneseFormatting:
+    def test_date_format(self, tzshift):
+        # Will run with all configured timezones, but only the Japanese locale.
+        ...
+
+    def test_currency_format(self, tzshift):
+        # Also runs with only the Japanese locale.
+        ...
 ```
 
-### Example: Disable for a test
+### Example: Disabling for a Specific Test
+
+Sometimes, a test has no dependency on timezone or locale. Running it multiple times is redundant. You can easily opt-out.
 
 ```python
 @pytest.mark.tzshift(disable=True)
-def test_no_parametrize():
-    # No tz/locale parametrization for this test
-    ...
+def test_pure_math_logic(tzshift):
+    # This test will run only once, with system default settings.
+    # The `tzshift` fixture will still be available but won't cause parametrization.
+    assert 2 + 2 == 4
 ```
-
-### Precedence
-
-* **Most specific wins:** Function > Class > Module > Config/CLI defaults.
 
 ---
 
-## 4. Special Values: The “SYSTEM” Sentinel
+## Special Values and Validation
 
-If you want to include the **system default** timezone or locale, use `"SYSTEM"` (case-insensitive, or just an empty string):
+### The "SYSTEM" Sentinel
+
+`pytest-tzshift` recognizes the special string `"SYSTEM"` (case-insensitive) for both timezones and locales. When used, the plugin will not modify the system's current setting for that parameter.
+
+This is useful for testing against a single, specific timezone while using the native environment of whatever machine is running the tests.
 
 ```python
-@pytest.mark.tzshift(timezones=["SYSTEM", "UTC"], locales=["SYSTEM", "en_US.UTF-8"])
-def test_with_system_defaults(tzshift):
+# test_system_locale.py
+
+import pytest
+
+# Test a specific timezone against the user's native locale
+@pytest.mark.tzshift(timezones=["Europe/Berlin"], locales=["SYSTEM"])
+def test_against_system_locale(tzshift):
+    # tzshift.timezone will be "Europe/Berlin"
+    # tzshift.locale will be "SYSTEM", and the actual locale remains unchanged.
     ...
 ```
-
-* `"SYSTEM"` means “leave as is” for timezone or locale in that combination.
-
----
-
-## 5. Example: Complete `pytest.ini`
-
-```ini
-[pytest]
-tz_timezones =
-    SYSTEM
-    Europe/Paris
-tz_locales =
-    SYSTEM
-    fr_FR.UTF-8
-tzshift_max = 6
-```
-
----
-
-## 6. How combinations are generated
-
-* The plugin forms the **Cartesian product** of all selected timezones and locales.
-* The total number can be limited with `tzshift_max`.
-* If any combination is invalid on your machine (e.g. a missing locale), it is automatically skipped and a warning is shown.
-
----
-
-## 7. Disabling pytest-tzshift entirely
-
-For a whole run, just add `--no-tzshift`:
-
-```shell
-pytest --no-tzshift
-```
-
-Or use `disable=True` in a marker to skip for specific tests.
-
----
-
-## 8. Tips
-
-* On **Windows**, timezone changes may have no effect due to system limitations.
-* **Locale changes are process-wide.** Avoid running locale-sensitive tests in parallel (one pytest worker).
-* Unknown or unsupported timezones/locales will be ignored with a warning.
-
----
-
-For more advanced usage, see [Markers & Fixtures](markers.md) and [API Reference](reference/api.md).

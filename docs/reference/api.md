@@ -1,110 +1,115 @@
 # API Reference
 
-This page lists the public objects exposed by **pytest-tzshift**.
-Everything else in the source tree should be considered **internal** and may change without notice.
+This page provides a detailed reference for the public API of `pytest-tzshift`, including the main fixture, data objects, constants, and the underlying Pytest hooks that power the plugin.
 
-!!! tip
-The tables below are generated automatically by **mkdocstrings** from the
-docstrings in the code.
-Click on a signature to expand the full documentation.
+This documentation is generated directly from the source code's docstrings.
 
----
+## Fixture
 
-## Top-level package
-
-\::: pytest\_tzshift
-
----
-
-## `TzShift` helper class
-
-A tiny immutable value object that represents a single `(timezone, locale)` combination and behaves like a 2-tuple.
-
-\::: pytest\_tzshift.\_types.TzShift
-
----
-
-## Pytest fixture
+The primary way to interact with this plugin is through the `tzshift` fixture.
 
 ### `tzshift`
 
-*Scope: function*
+Requesting the `tzshift` fixture in a test function is what triggers the timezone and locale parametrization for that test. The fixture is responsible for setting up the environment before your test runs and safely tearing it down afterward.
 
-Requesting this fixture in a test function activates timezone/locale parametrisation and yields a **`TzShift`** for the current combination.
+During the test run, it yields a `TzShift` object, giving you read-only access to the active settings.
 
-```python
-def test_formatting(tzshift):
-    tz, loc = tzshift           # tuple-unpacking works
-    assert isinstance(tzshift.timezone, str)
-    assert isinstance(tzshift.locale, str)
-```
+::: pytest_tzshift.plugin.tzshift
 
-| Attribute   | Type  | Description                                      |
-| ----------- | ----- | ------------------------------------------------ |
-| `.timezone` | `str` | The IANA timezone name currently in effect.      |
-| `.locale`   | `str` | The POSIX/GLIBC locale currently set (`LC_ALL`). |
-
-You rarely need to import anything—just ask for the fixture.
-
----
-
-## CLI options
-
-| Option             | Description                                       | Config key     |
-| ------------------ | ------------------------------------------------- | -------------- |
-| `--tz-timezones=…` | Comma-separated list of IANA time-zones to sweep. | `tz_timezones` |
-| `--tz-locales=…`   | Comma-separated list of locales to sweep.         | `tz_locales`   |
-| `--tzshift-max=N`  | Cap the number of `(tz, locale)` combinations.    | `tzshift_max`  |
-| `--no-tzshift`     | Disable all parametrisation for this run.         | *(none)*       |
-
-All options have matching keys in `pytest.ini` / `pyproject.toml`; CLI flags always win.
-
----
-
-## Marker
-
-### `@pytest.mark.tzshift`
+#### Example
 
 ```python
-@pytest.mark.tzshift(
-    timezones=["UTC", "America/New_York"],
-    locales=["C"],
-    disable=False
-)
-def test_my_function(tzshift):
-    ...
+from pytest_tzshift import TzShift
+import time
+import locale
+
+def test_time_and_locale_behavior(tzshift: TzShift):
+    """
+    A test that uses the tzshift fixture.
+
+    This test will be run for each combination of configured
+    timezones and locales.
+    """
+    # The `tzshift` object provides the active settings for this run.
+    print(f"Active Timezone: {tzshift.timezone}")
+    print(f"Active Locale:   {tzshift.locale}")
+
+    # The environment reflects these settings.
+    # Note: time.tzname will reflect the active timezone.
+    print(f"time.tzname: {time.tzname}")
+
+    # Note: locale.getlocale() will reflect the active locale.
+    print(f"locale.getlocale(locale.LC_ALL): {locale.getlocale(locale.LC_ALL)}")
+
+    # Your test logic here...
+    assert True
 ```
 
-| Argument    | Type        | Meaning                                                           |
-| ----------- | ----------- | ----------------------------------------------------------------- |
-| `timezones` | `list[str]` | Replace the configured time-zone list for this test/class/module. |
-| `locales`   | `list[str]` | Replace the configured locale list.                               |
-| `disable`   | `bool`      | If `True`, run the test exactly once with the system defaults.    |
+## Data Objects
 
-Precedence: **function > class > module > global config**.
+The plugin uses a simple data object to pass information to your tests.
 
----
+### `TzShift`
 
-## Sentinel constants
+This object is yielded by the `tzshift` fixture.
 
-| Name            | Value      | Meaning                                                |
-| --------------- | ---------- | ------------------------------------------------------ |
-| `SYSTEM_TZ`     | `"SYSTEM"` | Keep the system’s current time-zone for this position. |
-| `SYSTEM_LOCALE` | `"SYSTEM"` | Keep the system’s current locale.                      |
+::: pytest_tzshift._types.TzShift
 
-These are meant to be passed via markers or CLI/config lists:
+#### Example
 
-```ini
-[pytest]
-tz_timezones = SYSTEM, UTC
-tz_locales   = SYSTEM, en_US.UTF-8
+```python
+from pytest_tzshift import TzShift
+
+def test_unpacking(tzshift: TzShift):
+    # Unpack like a tuple
+    tz, loc = tzshift
+
+    assert tz == tzshift.timezone
+    assert loc == tzshift.locale
+
+    # Access by index
+    assert tzshift[0] == tzshift.timezone
+    assert tzshift[1] == tzshift.locale
+
+    # Get length
+    assert len(tzshift) == 2
+
+    # Explicitly convert to a tuple
+    assert tzshift.as_tuple() == (tz, loc)
 ```
 
----
+## Constants
 
-### Stability policy
+The plugin exposes sentinel values that have special meaning in configuration.
 
-* Objects documented on this page follow **semantic versioning**.
-* Anything not listed here (private helpers, internal modules) may change at any time without a major version bump.
+### `SYSTEM_TZ`
 
-If you need something that is not yet part of the public API, please open an issue so we can make it official!
+::: pytest_tzshift.plugin.SYSTEM_TZ
+A sentinel string used in timezone lists to indicate that the original system timezone should be used as one of the parameterization values.
+
+### `SYSTEM_LOCALE`
+
+::: pytest_tzshift.plugin.SYSTEM_LOCALE
+A sentinel string used in locale lists to indicate that the original system locale should be used as one of the parameterization values.
+
+## Pytest Hooks
+
+For advanced users and contributors, `pytest-tzshift` implements the following standard Pytest hooks. You do not need to interact with these directly to use the plugin, but they are documented here for completeness. The user-facing results of these hooks are the command-line options, `pytest.ini` settings, and the `@pytest.mark.tzshift` marker.
+
+### `pytest_generate_tests`
+
+This is the core engine of the plugin, responsible for creating the parametrized test runs.
+
+::: pytest_tzshift.plugin.pytest_generate_tests
+
+### `pytest_addoption`
+
+This hook adds the command-line and `pytest.ini` configuration options. For details on using these options, see the [Configuration](./../usage/configuration.md) guide.
+
+::: pytest_tzshift.plugin.pytest_addoption
+
+### `pytest_configure`
+
+This hook registers the `tzshift` marker, allowing for per-test or per-scope overrides.
+
+::: pytest_tzshift.plugin.pytest_configure

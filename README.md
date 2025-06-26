@@ -110,7 +110,6 @@ def test_native_env():
 
 * **Quick start** – `docs/usage/quickstart.md`
 * **Configuration details** – `docs/usage/configuration.md`
-* **Markers & fixtures** – `docs/usage/markers.md`
 * **API reference** – `docs/reference/api.md`
 
 Browse the full site at **[https://spedr.github.io/pytest-tzshift](https://spedr.github.io/pytest-tzshift)** once published.
@@ -119,7 +118,7 @@ Browse the full site at **[https://spedr.github.io/pytest-tzshift](https://spedr
 ## Contributing
 
 Bug reports, feature ideas, and pull requests are warmly welcome!
-See [CONTRIBUTING](docs/contributing.md) for tips on setting up a dev environment, coding style, and running the test suite.
+See [Contributing](docs/contributing.md) for tips on setting up a dev environment, coding style, and running the test suite.
 
 
 ## License
