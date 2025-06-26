@@ -1,7 +1,7 @@
 # pytest-tzshift
 
 [![PyPI version](https://img.shields.io/pypi/v/pytest-tzshift.svg)](https://pypi.org/project/pytest-tzshift/)
-[![CI](https://github.com/spedr/pytest-tzshift/actions/workflows/ci.yml/badge.svg)](https://github.com/spedr/pytest-tzshift/actions/workflows/CI.yml)
+[![CI](https://github.com/spedr/pytest-tzshift/actions/workflows/CI.yml/badge.svg)](https://github.com/spedr/pytest-tzshift/actions/workflows/CI.yml)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 *A tiny Pytest plug-in that automatically re-runs your tests under a matrix of time-zones and locales.*
