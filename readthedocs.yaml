@@ -10,5 +10,5 @@ mkdocs:
 
 python:
   install:
-    - pip install -e .
+    - path: .
     - requirements: docs/requirements.txt
