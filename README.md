@@ -108,9 +108,9 @@ def test_native_env():
 
 ## Documentation
 
-* [**Quick start**](https://pytest-tzshift.github.io/usage/quickstart/)
-* [**Configuration**](https://pytest-tzshift.github.io/usage/configuration/)
-* [**API Reference**](https://pytest-tzshift.github.io/reference/api/)
+* [**Quick start**](https://pytest-tzshift.readthedocs.org/usage/quickstart/)
+* [**Configuration**](https://pytest-tzshift.readthedocs.org/usage/configuration/)
+* [**API Reference**](https://pytest-tzshift.readthedocs.org/reference/api/)
 
 
 ## Contributing

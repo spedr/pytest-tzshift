@@ -10,4 +10,5 @@ mkdocs:
 
 python:
   install:
+    - pip install -e .
     - requirements: docs/requirements.txt
