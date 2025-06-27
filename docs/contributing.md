@@ -63,7 +63,7 @@ pytest
 
 ---
 
-### 5. Run Checks
+### Run Checks
 
 Before you push, run:
 
