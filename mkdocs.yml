@@ -4,6 +4,7 @@ site_description: >
   A Pytest plugin that transparently re-runs tests under a matrix of
   timezones and locales.
 site_author: Pedro Sanvido
+site_url: https://pytest-tzshift.readthedocs.io/en/latest/
 repo_url: https://github.com/spedr/pytest-tzshift
 copyright: © 2025 Pedro Sanvido
 
