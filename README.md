@@ -96,7 +96,7 @@ def test_once_only(tzshift):
 @pytest.mark.tzshift(disable=True)
 def test_native_env():
     ...
-```
+```g
 
 
 ## Platform notes
@@ -108,9 +108,9 @@ def test_native_env():
 
 ## Documentation
 
-* [**Quick start**](https://pytest-tzshift.readthedocs.org/usage/quickstart/)
-* [**Configuration**](https://pytest-tzshift.readthedocs.org/usage/configuration/)
-* [**API Reference**](https://pytest-tzshift.readthedocs.org/reference/api/)
+* [**Quick start**](https://pytest-tzshift.readthedocs.io/en/latest/usage/quickstart/)
+* [**Configuration**](https://pytest-tzshift.readthedocs.org/en/latest/usage/configuration/)
+* [**API Reference**](https://pytest-tzshift.readthedocs.org/en/latest/reference/api/)
 
 
 ## Contributing
