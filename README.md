@@ -96,7 +96,7 @@ def test_once_only(tzshift):
 @pytest.mark.tzshift(disable=True)
 def test_native_env():
     ...
-```g
+```
 
 
 ## Platform notes
